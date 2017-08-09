@@ -2,17 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	imageType "github.com/mushroomsir/image-type"
 )
 
 func main() {
-	file, _ := os.Open("../testdata/test.jpg")
-
-	bytes := make([]byte, 256)
-	file.Read(bytes)
-	res, err := imageType.Parse(bytes)
+	res, err := imageType.ParsePath("../testdata/test.jpg")
 	if err == nil {
 		fmt.Println(res.Type)     // jpg
 		fmt.Println(res.MimeType) // image/jpeg

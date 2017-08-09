@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"io"
+	"os"
 )
 
 // ImageInfo ...
@@ -14,10 +15,33 @@ type ImageInfo struct {
 	Height   int
 }
 
+var headerLength = 256
+
+// ParsePath ...
+func ParsePath(filePath string) (img *ImageInfo, err error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	bytes := make([]byte, headerLength)
+	file.Read(bytes)
+	return Parse(bytes)
+}
+
+// ParseFile ...
+func ParseFile(file *os.File) (img *ImageInfo, err error) {
+	bytes := make([]byte, headerLength)
+	_, err = file.Read(bytes)
+	if err != nil {
+		return
+	}
+	return Parse(bytes)
+}
+
 // ParseReader ...
 func ParseReader(rd io.Reader) (img *ImageInfo, err error) {
 	br := bufio.NewReader(rd)
-	bytes, err := br.Peek(256)
+	bytes, err := br.Peek(headerLength)
 	if err != nil {
 		return
 	}

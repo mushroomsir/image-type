@@ -9,10 +9,7 @@ import (
 
 func TestJPEG(t *testing.T) {
 	assert := assert.New(t)
-	file, _ := os.Open("testdata/test.jpg")
-	bytes := make([]byte, 256)
-	file.Read(bytes)
-	res, err := Parse(bytes)
+	res, err := ParsePath("testdata/test.jpg")
 	if assert.Nil(err) {
 		assert.Equal("jpg", res.Type)
 		assert.Equal("image/jpeg", res.MimeType)
@@ -23,9 +20,7 @@ func TestJPEG(t *testing.T) {
 func TestPng(t *testing.T) {
 	assert := assert.New(t)
 	file, _ := os.Open("testdata/test.png")
-	bytes := make([]byte, 256)
-	file.Read(bytes)
-	res, err := Parse(bytes)
+	res, err := ParseFile(file)
 	if assert.Nil(err) {
 		assert.Equal("png", res.Type)
 		assert.Equal("image/png", res.MimeType)
@@ -37,9 +32,7 @@ func TestPng(t *testing.T) {
 func TestGif(t *testing.T) {
 	assert := assert.New(t)
 	file, _ := os.Open("testdata/test.gif")
-	bytes := make([]byte, 256)
-	file.Read(bytes)
-	res, err := Parse(bytes)
+	res, err := ParseReader(file)
 	if assert.Nil(err) {
 		assert.Equal("gif", res.Type)
 		assert.Equal("image/gif", res.MimeType)
