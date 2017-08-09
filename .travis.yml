@@ -2,7 +2,6 @@ language: go
 
 matrix:
   include:
-    - go: 1.7.x
     - go: 1.8.x
     - master
 
@@ -12,8 +11,7 @@ before_install:
   - go get github.com/mattn/goveralls
 
 script:
-  - go vet $(go list ./... | grep -v /vendor/)
-  - go test -v -race ./...
+  - go test -v ./...
   - go test -coverprofile=image-type.coverprofile
   - gover
   - goveralls -coverprofile=gover.coverprofile -service=travis-ci

@@ -1,6 +1,10 @@
 package imageType
 
-import "errors"
+import (
+	"bufio"
+	"errors"
+	"io"
+)
 
 // ImageInfo ...
 type ImageInfo struct {
@@ -8,6 +12,16 @@ type ImageInfo struct {
 	MimeType string
 	Width    int
 	Height   int
+}
+
+// ParseReader ...
+func ParseReader(rd io.Reader) (img *ImageInfo, err error) {
+	br := bufio.NewReader(rd)
+	bytes, err := br.Peek(256)
+	if err != nil {
+		return
+	}
+	return Parse(bytes)
 }
 
 // Parse ...
@@ -61,9 +75,10 @@ func parsePng(bytes []byte, img *ImageInfo) {
 	byteLen := len(bytes)
 	img.MimeType = "image/png"
 	img.Type = "png"
-	if byteLen > 15 {
-		img.Width = int(bytes[0])<<24 | int(bytes[1])<<16 | int(bytes[2])<<8 | int(bytes[3])
-		img.Height = int(bytes[4])<<24 | int(bytes[5])<<16 | int(bytes[6])<<8 | int(bytes[7])
+	if byteLen > 23 {
+		r := bytes[16:]
+		img.Width = int(r[0])<<24 | int(r[1])<<16 | int(r[2])<<8 | int(r[3])
+		img.Height = int(r[4])<<24 | int(r[5])<<16 | int(r[6])<<8 | int(r[7])
 	}
 }
 func parseGif(bytes []byte, img *ImageInfo) {
@@ -71,20 +86,23 @@ func parseGif(bytes []byte, img *ImageInfo) {
 	img.MimeType = "image/gif"
 	img.Type = "gif"
 	if byteLen > 5 {
-		img.Width = int(bytes[0]) + int(bytes[1])*256
-		img.Height = int(bytes[2]) + int(bytes[3])*256
+		r := bytes[6:]
+		img.Width = int(r[0]) + int(r[1])*256
+		img.Height = int(r[2]) + int(r[3])*256
 	}
 }
+
 func parseBmp(bytes []byte, img *ImageInfo) {
 	byteLen := len(bytes)
 	img.MimeType = "image/bmp"
 	img.Type = "bmp"
-	if byteLen > 17 {
-		img.Width = int(bytes[3])<<24 | int(bytes[2])<<16 | int(bytes[1])<<8 | int(bytes[0])
-		img.Height = int(bytes[7])<<24 | int(bytes[6])<<16 | int(bytes[5])<<8 | int(bytes[4])
+	if byteLen > 21 {
+		r := bytes[18:]
+		img.Width = int(r[3])<<24 | int(r[2])<<16 | int(r[1])<<8 | int(r[0])
+		img.Height = int(r[7])<<24 | int(r[6])<<16 | int(r[5])<<8 | int(r[4])
 	}
 }
-func parseWebp(bytes []byte, img *ImageInfo) {
+func parseWebp(data []byte, img *ImageInfo) {
 	img.MimeType = "image/webp"
 	img.Type = "webp"
 }

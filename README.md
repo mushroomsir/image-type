@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	file, _ := os.Open("../testdata/test1.jpg")
+	file, _ := os.Open("../testdata/test.jpg")
 
 	bytes := make([]byte, 256)
 	file.Read(bytes)
