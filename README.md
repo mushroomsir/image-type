@@ -10,24 +10,34 @@
 go get github.com/mushroomsir/image-type
 ```
 
+# Support 
+| Format | Type    | MimeType | Dimension |
+| ----- | ------- | -------- | --------- |
+| jpg   | support | support  | support   |
+| png   | support | support  | support   |
+| gif   | support | support  | support   |
+| bmp   | support | support  | support   |
+| webp  | support | support  | support   |
+| ico   | support | support  | no        |
+
+
+
 # Usage
-## parse media type
+## parse image
 ```go
 package main
 
 import (
 	"fmt"
-	"os"
 
 	imageType "github.com/mushroomsir/image-type"
 )
 
 func main() {
-	file, _ := os.Open("../testdata/test.jpg")
-
-	bytes := make([]byte, 256)
-	file.Read(bytes)
-	res, err := imageType.Parse(bytes)
+	// imageType.ParseFile(file *os.File)
+	// imageType.ParseReader(rd io.Reader)
+	// imageType.Parse(bytes []byte)
+	res, err := imageType.ParsePath("../testdata/test.jpg")
 	if err == nil {
 		fmt.Println(res.Type)     // jpg
 		fmt.Println(res.MimeType) // image/jpeg
@@ -36,6 +46,14 @@ func main() {
 	} else {
 		fmt.Println(err)
 	}
+}
+```
+## check image
+
+```go
+res, _ := imageType.ParsePath("../testdata/test.jpg")
+if img != nil {
+	fmt.Println("It's image")
 }
 ```
 

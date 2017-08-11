@@ -54,3 +54,17 @@ func TestBmp(t *testing.T) {
 		assert.Equal(630, res.Height)
 	}
 }
+
+func TestWebp(t *testing.T) {
+	assert := assert.New(t)
+	file, _ := os.Open("testdata/test.webp")
+	bytes := make([]byte, 256)
+	file.Read(bytes)
+	res, err := Parse(bytes)
+	if assert.Nil(err) {
+		assert.Equal("webp", res.Type)
+		assert.Equal("image/webp", res.MimeType)
+		assert.Equal(386, res.Width)
+		assert.Equal(395, res.Height)
+	}
+}

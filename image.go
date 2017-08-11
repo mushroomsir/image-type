@@ -48,6 +48,13 @@ func ParseReader(rd io.Reader) (img *ImageInfo, err error) {
 	return Parse(bytes)
 }
 
+/**
+webp
+https://chromium.googlesource.com/webm/libwebp/+/master/doc/webp-lossless-bitstream-spec.txt
+https://developers.google.com/speed/webp/docs/riff_container
+
+*/
+
 // Parse ...
 func Parse(bytes []byte) (img *ImageInfo, err error) {
 	img = &ImageInfo{}
@@ -126,18 +133,22 @@ func parseBmp(bytes []byte, img *ImageInfo) {
 		img.Height = int(r[7])<<24 | int(r[6])<<16 | int(r[5])<<8 | int(r[4])
 	}
 }
-func parseWebp(data []byte, img *ImageInfo) {
+func parseWebp(bytes []byte, img *ImageInfo) {
+	byteLen := len(bytes)
 	img.MimeType = "image/webp"
 	img.Type = "webp"
+	if byteLen > 24 {
+		r := bytes[12:]
+		if r[0] == 0x56 && r[1] == 0x50 && r[2] == 0x38 && r[3] == 0x4C {
+			r = bytes[21:]
+			img.Width = 1 + (((int(r[1]) & 0x3F) << 8) | int(r[1]))
+			img.Height = 1 + (((int(r[3]) & 0xF) << 10) | int(r[2])<<2 | (int(r[1]) & 0xC0 >> 6))
+		}
+	}
 }
 
 func parseIco(bytes []byte, img *ImageInfo) {
 	img.MimeType = "image/x-icon"
 	img.Type = "ico"
-}
 
-// IsImage ...
-func IsImage(bytes []byte) bool {
-	img, _ := Parse(bytes)
-	return img != nil
 }
