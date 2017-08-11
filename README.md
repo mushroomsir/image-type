@@ -52,7 +52,7 @@ func main() {
 
 ```go
 res, _ := imageType.ParsePath("../testdata/test.jpg")
-if img != nil {
+if res != nil {
 	fmt.Println("It's image")
 }
 ```
