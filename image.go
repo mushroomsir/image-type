@@ -83,24 +83,24 @@ func parseJpg(bytes []byte, img *ImageInfo) {
 	byteLen := len(bytes)
 	img.MimeType = "image/jpeg"
 	img.Type = "jpg"
-	if byteLen < 6 {
-		return
-	}
-	position := int64(4)
-	r := bytes[position:]
-	length := int(r[0]<<8) + int(r[1])
-	for position < int64(byteLen) {
-		position += int64(length)
-		r = bytes[position:]
-		length = int(r[2])<<8 + int(r[3])
-		if (r[1] == 0xC0 || r[1] == 0xC2) && r[0] == 0xFF && length > 7 {
-			r = bytes[position+5:]
-			img.Width = int(r[2])<<8 + int(r[3])
-			img.Height = int(r[0])<<8 + int(r[1])
-			return
+	if byteLen > 6 {
+		position := int64(4)
+		r := bytes[position:]
+		length := int(r[0]<<8) + int(r[1])
+		for position < int64(byteLen) {
+			position += int64(length)
+			r = bytes[position:]
+			length = int(r[2])<<8 + int(r[3])
+			if (r[1] == 0xC0 || r[1] == 0xC2) && r[0] == 0xFF && length > 7 {
+				r = bytes[position+5:]
+				img.Width = int(r[2])<<8 + int(r[3])
+				img.Height = int(r[0])<<8 + int(r[1])
+				break
+			}
+			position += 2
 		}
-		position += 2
 	}
+	return
 }
 func parsePng(bytes []byte, img *ImageInfo) {
 	byteLen := len(bytes)
@@ -143,6 +143,13 @@ func parseWebp(bytes []byte, img *ImageInfo) {
 			r = bytes[21:]
 			img.Width = 1 + (((int(r[1]) & 0x3F) << 8) | int(r[1]))
 			img.Height = 1 + (((int(r[3]) & 0xF) << 10) | int(r[2])<<2 | (int(r[1]) & 0xC0 >> 6))
+		} else {
+			// https://tools.ietf.org/html/rfc6386#section-9
+			r = bytes[23:]
+			if r[0] == 0x9d && r[1] == 0x01 && r[2] == 0x2a {
+				img.Width = int(r[4]&0x3f)<<8 | int(r[3])
+				img.Height = int(r[6]&0x3f)<<8 | int(r[5])
+			}
 		}
 	}
 }
@@ -150,5 +157,4 @@ func parseWebp(bytes []byte, img *ImageInfo) {
 func parseIco(bytes []byte, img *ImageInfo) {
 	img.MimeType = "image/x-icon"
 	img.Type = "ico"
-
 }

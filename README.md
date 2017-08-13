@@ -18,6 +18,7 @@ go get github.com/mushroomsir/image-type
 | gif   | support | support  | support   |
 | bmp   | support | support  | support   |
 | webp  | support | support  | support   |
+| webp(lossy)  | support | support  | support   |
 | ico   | support | support  | no        |
 
 

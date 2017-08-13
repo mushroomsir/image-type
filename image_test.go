@@ -7,6 +7,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestError(t *testing.T) {
+	assert := assert.New(t)
+	res, err := ParsePath("testdata/error.jpg")
+	assert.NotNil(err)
+	assert.Nil(res)
+
+	res, err = Parse([]byte{'x', 'c', 'x'})
+	assert.NotNil(err)
+	assert.Nil(res)
+}
 func TestJPEG(t *testing.T) {
 	assert := assert.New(t)
 	res, err := ParsePath("testdata/test.jpg")
@@ -66,5 +76,31 @@ func TestWebp(t *testing.T) {
 		assert.Equal("image/webp", res.MimeType)
 		assert.Equal(386, res.Width)
 		assert.Equal(395, res.Height)
+	}
+}
+
+func TestWebpLossy(t *testing.T) {
+	assert := assert.New(t)
+	file, _ := os.Open("testdata/testLossy.webp")
+	bytes := make([]byte, 256)
+	file.Read(bytes)
+	res, err := Parse(bytes)
+	if assert.Nil(err) {
+		assert.Equal("webp", res.Type)
+		assert.Equal("image/webp", res.MimeType)
+		assert.Equal(550, res.Width)
+		assert.Equal(368, res.Height)
+	}
+}
+
+func TestIco(t *testing.T) {
+	assert := assert.New(t)
+	file, _ := os.Open("testdata/test.ico")
+	bytes := make([]byte, 256)
+	file.Read(bytes)
+	res, err := Parse(bytes)
+	if assert.Nil(err) {
+		assert.Equal("ico", res.Type)
+		assert.Equal("image/x-icon", res.MimeType)
 	}
 }
