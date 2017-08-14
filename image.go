@@ -82,7 +82,7 @@ func Parse(bytes []byte) (img *ImageInfo, err error) {
 func parseJpg(bytes []byte, img *ImageInfo) {
 	byteLen := len(bytes)
 	img.MimeType = "image/jpeg"
-	img.Type = "jpg"
+	img.Type = "jpeg"
 	if byteLen > 6 {
 		position := int64(4)
 		r := bytes[position:]

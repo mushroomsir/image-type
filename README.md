@@ -13,7 +13,7 @@ go get github.com/mushroomsir/image-type
 # Support 
 | Format | Type    | MimeType | Dimension |
 | ----- | ------- | -------- | --------- |
-| jpg   | support | support  | support   |
+| jpeg   | support | support  | support   |
 | png   | support | support  | support   |
 | gif   | support | support  | support   |
 | bmp   | support | support  | support   |
@@ -40,7 +40,7 @@ func main() {
 	// imageType.Parse(bytes []byte)
 	res, err := imageType.ParsePath("../testdata/test.jpg")
 	if err == nil {
-		fmt.Println(res.Type)     // jpg
+		fmt.Println(res.Type)     // jpeg
 		fmt.Println(res.MimeType) // image/jpeg
 		fmt.Println(res.Width)    // 600
 		fmt.Println(res.Height)   // 600

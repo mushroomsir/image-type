@@ -21,7 +21,7 @@ func TestJPEG(t *testing.T) {
 	assert := assert.New(t)
 	res, err := ParsePath("testdata/test.jpg")
 	if assert.Nil(err) {
-		assert.Equal("jpg", res.Type)
+		assert.Equal("jpeg", res.Type)
 		assert.Equal("image/jpeg", res.MimeType)
 		assert.Equal(600, res.Width)
 		assert.Equal(600, res.Height)
