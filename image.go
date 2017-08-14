@@ -2,6 +2,7 @@ package imageType
 
 import (
 	"bufio"
+	"encoding/binary"
 	"errors"
 	"io"
 	"os"
@@ -71,6 +72,8 @@ func Parse(bytes []byte) (img *ImageInfo, err error) {
 		parseWebp(bytes, img)
 	} else if byteLen > 3 && bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0x01 && bytes[3] == 0x00 {
 		parseIco(bytes, img)
+	} else if byteLen > 3 && bytes[0] == 56 && bytes[1] == 66 && bytes[2] == 80 && bytes[3] == 83 {
+		parsePsd(bytes, img)
 	}
 	if len(img.Type) == 0 {
 		img = nil
@@ -157,4 +160,14 @@ func parseWebp(bytes []byte, img *ImageInfo) {
 func parseIco(bytes []byte, img *ImageInfo) {
 	img.MimeType = "image/x-icon"
 	img.Type = "ico"
+}
+
+func parsePsd(bytes []byte, img *ImageInfo) {
+	byteLen := len(bytes)
+	img.MimeType = "image/vnd.adobe.photoshop"
+	img.Type = "psd"
+	if byteLen > 17 {
+		img.Width = int(binary.BigEndian.Uint32(bytes[18:]))
+		img.Height = int(binary.BigEndian.Uint32(bytes[14:]))
+	}
 }

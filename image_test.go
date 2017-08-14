@@ -1,6 +1,7 @@
 package imageType
 
 import (
+	"bytes"
 	"os"
 	"testing"
 
@@ -14,6 +15,10 @@ func TestError(t *testing.T) {
 	assert.Nil(res)
 
 	res, err = Parse([]byte{'x', 'c', 'x'})
+	assert.NotNil(err)
+	assert.Nil(res)
+
+	res, err = ParseReader(bytes.NewReader([]byte{'x', 'c', 'x'}))
 	assert.NotNil(err)
 	assert.Nil(res)
 }
@@ -102,5 +107,19 @@ func TestIco(t *testing.T) {
 	if assert.Nil(err) {
 		assert.Equal("ico", res.Type)
 		assert.Equal("image/x-icon", res.MimeType)
+	}
+}
+
+func TestPsd(t *testing.T) {
+	assert := assert.New(t)
+	file, _ := os.Open("testdata/test.psd")
+	bytes := make([]byte, 256)
+	file.Read(bytes)
+	res, err := Parse(bytes)
+	if assert.Nil(err) {
+		assert.Equal("psd", res.Type)
+		assert.Equal("image/vnd.adobe.photoshop", res.MimeType)
+		assert.Equal(2481, res.Width)
+		assert.Equal(3507, res.Height)
 	}
 }
