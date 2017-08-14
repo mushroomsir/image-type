@@ -20,7 +20,7 @@ go get github.com/mushroomsir/image-type
 | webp  | support | support  | support   |
 | webp(lossy)  | support | support  | support   |
 | psd  | support | support  | support   |
-| ico   | support | support  | no        |
+| ico   | support | support  | support        |
 
 
 
