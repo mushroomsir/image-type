@@ -27,6 +27,7 @@ func TestParse(t *testing.T) {
 		{"testdata/test.bmp", "bmp", "image/bmp", 622, 630},
 		{"testdata/test.ico", "ico", "image/x-icon", 32, 32},
 		{"testdata/test-multi-size.ico", "ico", "image/x-icon", 256, 256},
+		{"testdata/test.tiff", "tiff", "image/tiff", 0, 0},
 	}
 	for i, c := range cases {
 		var res *ImageInfo

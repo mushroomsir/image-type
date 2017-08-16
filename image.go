@@ -73,8 +73,10 @@ func Parse(bytes []byte) (img *ImageInfo, err error) {
 		parseWebp(bytes, img)
 	} else if bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0x01 && bytes[3] == 0x00 {
 		parseIco(bytes, img)
-	} else if bytes[0] == 56 && bytes[1] == 66 && bytes[2] == 80 && bytes[3] == 83 {
+	} else if bytes[0] == 0x38 && bytes[1] == 0x42 && bytes[2] == 0x50 && bytes[3] == 0x53 {
 		parsePsd(bytes, img)
+	} else if binary.BigEndian.Uint32(bytes) == 0x49492a00 || binary.BigEndian.Uint32(bytes) == 0x4d4d002a {
+		parseTiff(bytes, img)
 	}
 	if len(img.Type) == 0 {
 		img = nil
@@ -198,4 +200,9 @@ func parsePsd(bytes []byte, img *ImageInfo) {
 	img.Type = "psd"
 	img.Width = int(binary.BigEndian.Uint32(bytes[18:]))
 	img.Height = int(binary.BigEndian.Uint32(bytes[14:]))
+}
+
+func parseTiff(bytes []byte, img *ImageInfo) {
+	img.MimeType = "image/tiff"
+	img.Type = "tiff"
 }
