@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"encoding/binary"
 	"errors"
+	"image"
+	_ "image/jpeg"
 	"io"
 	"os"
 )
@@ -29,40 +31,20 @@ func ParsePath(filePath string) (img *ImageInfo, err error) {
 		return nil, err
 	}
 	defer file.Close()
-	bytes := make([]byte, headerLength)
-	file.Read(bytes)
-	return Parse(bytes)
+	return Parse(file)
 }
 
-// ParseFile ...
-func ParseFile(file *os.File) (img *ImageInfo, err error) {
-	bytes := make([]byte, headerLength)
-	_, err = file.Read(bytes)
-	if err != nil {
-		return
-	}
-	return Parse(bytes)
-}
-
-// ParseReader ...
-func ParseReader(rd io.Reader) (img *ImageInfo, err error) {
+// Parse ...
+func Parse(rd io.Reader) (img *ImageInfo, err error) {
 	br := bufio.NewReader(rd)
 	bytes, err := br.Peek(headerLength)
 	if err != nil {
 		return
 	}
-	return Parse(bytes)
-}
-
-// Parse ...
-func Parse(bytes []byte) (img *ImageInfo, err error) {
 	img = &ImageInfo{}
-	byteLen := len(bytes)
-	if byteLen < headerLength {
-		return nil, ErrInvalidLength
-	}
 	if bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF {
-		parseJpg(bytes, img)
+		err = parseJpg(br, img)
+		return
 	} else if bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47 {
 		parsePng(bytes, img)
 	} else if bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 {
@@ -85,26 +67,15 @@ func Parse(bytes []byte) (img *ImageInfo, err error) {
 	return
 }
 
-func parseJpg(bytes []byte, img *ImageInfo) {
-	byteLen := len(bytes)
+func parseJpg(rd io.Reader, img *ImageInfo) error {
 	img.MimeType = "image/jpeg"
 	img.Type = "jpeg"
-	position := int64(4)
-	r := bytes[position:]
-	length := int(r[0]<<8) + int(r[1])
-	for position < int64(byteLen) {
-		position += int64(length)
-		r = bytes[position:]
-		length = int(r[2])<<8 + int(r[3])
-		if (r[1] == 0xC0 || r[1] == 0xC2) && r[0] == 0xFF && length > 7 {
-			r = bytes[position+5:]
-			img.Width = int(r[2])<<8 + int(r[3])
-			img.Height = int(r[0])<<8 + int(r[1])
-			break
-		}
-		position += 2
+	image, _, err := image.DecodeConfig(rd)
+	if err == nil {
+		img.Height = image.Height
+		img.Width = image.Width
 	}
-	return
+	return err
 }
 func parsePng(bytes []byte, img *ImageInfo) {
 	img.MimeType = "image/png"

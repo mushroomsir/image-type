@@ -7,10 +7,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParse(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 	cases := []struct {
 		path      string
 		imageType string
@@ -18,6 +20,7 @@ func TestParse(t *testing.T) {
 		width     int
 		height    int
 	}{
+		{"testdata/test2.jpg", "jpeg", "image/jpeg", 198, 169},
 		{"testdata/test.jpg", "jpeg", "image/jpeg", 600, 600},
 		{"testdata/test.png", "png", "image/png", 612, 357},
 		{"testdata/test.gif", "gif", "image/gif", 500, 500},
@@ -35,50 +38,34 @@ func TestParse(t *testing.T) {
 		var file *os.File
 		if i == 0 {
 			res, err = ParsePath(c.path)
-		} else if i == 1 {
-			file, _ = os.Open(c.path)
-			res, err = ParseFile(file)
-		} else if i == 2 {
-			file, _ = os.Open(c.path)
-			res, err = ParseReader(file)
 		} else {
 			file, _ = os.Open(c.path)
-			bytes := make([]byte, 256)
-			file.Read(bytes)
-			res, err = Parse(bytes)
+			res, err = Parse(file)
 		}
-		if assert.Nil(err) {
-			assert.Equal(c.imageType, res.Type)
-			assert.Equal(c.mimeType, res.MimeType)
-			assert.Equal(c.width, res.Width)
-			assert.Equal(c.height, res.Height)
-		}
+		require.Nil(err)
+		assert.Equal(c.imageType, res.Type)
+		assert.Equal(c.mimeType, res.MimeType)
+		assert.Equal(c.width, res.Width)
+		assert.Equal(c.height, res.Height)
 		if i != 0 {
 			file.Close()
 		}
 	}
 }
 func TestError(t *testing.T) {
+
 	assert := assert.New(t)
 	res, err := ParsePath("testdata/error.jpg")
 	assert.NotNil(err)
 	assert.Nil(res)
 
-	res, err = Parse([]byte{'x', 'c', 'x'})
-	assert.NotNil(err)
-	assert.Nil(res)
-
-	res, err = ParseReader(bytes.NewReader([]byte(strings.Repeat("x", 257))))
-	assert.NotNil(err)
-	assert.Nil(res)
-
-	res, err = ParseReader(bytes.NewReader([]byte(strings.Repeat("x", 2))))
+	res, err = Parse(bytes.NewReader([]byte(strings.Repeat("x", 257))))
 	assert.NotNil(err)
 	assert.Nil(res)
 
 	f, err := os.Create("test.txt")
 	assert.Nil(err)
-	res, err = ParseFile(f)
+	res, err = Parse(f)
 	assert.NotNil(err)
 	assert.Nil(res)
 	f.Close()
