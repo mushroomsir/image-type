@@ -4,29 +4,29 @@
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://github.com/mushroomsir/image-type/blob/master/LICENSE)
 
 
-# Installation
+## Installation
 
 ```sh
 go get github.com/mushroomsir/image-type
 ```
 
-# Support 
-| Format | Type    | MimeType | Dimension |
-| ----- | ------- | -------- | --------- |
-| jpeg   | support | support  | support   |
-| png   | support | support  | support   |
-| gif   | support | support  | support   |
-| bmp   | support | support  | support   |
-| webp  | support | support  | support   |
-| webp(lossy)  | support | support  | support   |
-| psd  | support | support  | support   |
-| ico   | support | support  | support        |
-| tiff   | support | support  | no        |
+## Support Format
+
+- jpeg 
+- png
+- gif 
+- bmp  
+- webp 
+- webp(lossy) 
+- psd 
+- ico 
+- tiff
+- dds
 
 
 
-# Usage
-## parse image
+## Usage
+### parse image
 ```go
 package main
 
@@ -51,7 +51,7 @@ func main() {
 	}
 }
 ```
-## check image
+### check image
 
 ```go
 res, _ := imageType.ParsePath("../testdata/test.jpg")
@@ -60,6 +60,6 @@ if res != nil {
 }
 ```
 
-# Licenses
+## Licenses
 
 All source code is licensed under the [MIT License](https://github.com/mushroomsir/image-type/blob/master/LICENSE).

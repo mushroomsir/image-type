@@ -30,7 +30,8 @@ func TestParse(t *testing.T) {
 		{"testdata/test.bmp", "bmp", "image/bmp", 622, 630},
 		{"testdata/test.ico", "ico", "image/x-icon", 32, 32},
 		{"testdata/test-multi-size.ico", "ico", "image/x-icon", 256, 256},
-		{"testdata/test.tiff", "tiff", "image/tiff", 0, 0},
+		{"testdata/test.tiff", "tiff", "image/tiff", 1600, 2100},
+		{"testdata/test.dds", "dds", "image/vnd-ms.dds", 123, 456},
 	}
 	for i, c := range cases {
 		var res *ImageInfo
@@ -53,13 +54,24 @@ func TestParse(t *testing.T) {
 	}
 }
 func TestError(t *testing.T) {
-
 	assert := assert.New(t)
-	res, err := ParsePath("testdata/error.jpg")
-	assert.NotNil(err)
-	assert.Nil(res)
+	cases := []struct {
+		n int
+	}{
+		{2},
+		{3},
+		{7},
+		{11},
+		{257},
+	}
+	for _, n := range cases {
+		r := bytes.NewReader([]byte(strings.Repeat("x", n.n)))
+		res, err := Parse(r)
+		assert.NotNil(err)
+		assert.Nil(res)
+	}
 
-	res, err = Parse(bytes.NewReader([]byte(strings.Repeat("x", 257))))
+	res, err := ParsePath("testdata/error.jpg")
 	assert.NotNil(err)
 	assert.Nil(res)
 
@@ -70,4 +82,25 @@ func TestError(t *testing.T) {
 	assert.Nil(res)
 	f.Close()
 	os.Remove("test.txt")
+}
+
+func TestError2(t *testing.T) {
+	assert := assert.New(t)
+	case2 := []struct {
+		n []byte
+	}{
+		{[]byte{0x89, 0x50, 0x4E, 0x47, 0x00}},
+		{[]byte{0x47, 0x49, 0x46, 0x00}},
+		{[]byte{0x42, 0x4D, 0x00}},
+		{[]byte{0x00, 0x00, 0x01, 0x00}},
+		{[]byte{0x38, 0x42, 0x50, 0x53}},
+		{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x4E, 0x47, 0x57, 0x45, 0x42, 0x50}},
+		{[]byte{0x44, 0x44, 0x53, 0x20}},
+	}
+	for _, n := range case2 {
+		r := bytes.NewReader(n.n)
+		res, err := Parse(r)
+		assert.NotNil(err)
+		assert.Nil(res)
+	}
 }

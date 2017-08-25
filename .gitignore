@@ -3,3 +3,4 @@ debug
 debug.test
 vendor
 make.ps1
+*.exe
